@@ -1,0 +1,43 @@
+html, body { 
+  padding: 0; 
+  height: 100%; 
+  width: 100%; 
+  font-family: arapey, serif;
+  font-size: 1.25em;
+  text-rendering: optimizeLegibility;
+}
+
+body { 
+  margin: 10px; 
+  background: #fff;
+}
+
+#map { 
+  height: 50%; 
+  border: 1px solid #888; 
+}
+
+#footer {
+  text-align: center;
+  font-size: 50%;
+}
+
+h1 { 
+  font-family: neuton, serif;
+  font-size: 300%; 
+  text-align: center;
+  text-weight: extra-bold;
+  text-shadow: 2px 1px 2px gray;
+  padding-bottom: 10px;
+}
+
+h2 {
+  font-family: neuton, serif;
+  padding-top: 10px;
+  font-size: 200%;
+  text-shadow: 1px 1px 1px gray;
+}
+
+.coat-of-arms {
+  width: 100%;
+}
