@@ -38,6 +38,26 @@ h2 {
   text-shadow: 1px 1px 1px gray;
 }
 
+.coats-of-arms {
+  display: inline-block;
+  vertical-align: middle;
+  float: none;
+}
+
 .coat-of-arms {
   width: 100%;
+}
+
+.maps {
+  display: inline-block;
+  vertical-align: middle;
+  float: none;
+}
+
+.map {
+  width: 100%;
+}
+
+#contact {
+  font-weight: bold;
 }
