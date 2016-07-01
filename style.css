@@ -61,3 +61,8 @@ h2 {
 #contact {
   font-weight: bold;
 }
+
+.book {
+  width: 100%;
+  height: 600px;
+}
