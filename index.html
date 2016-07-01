@@ -205,7 +205,7 @@ function load() {
               mercator.fromPixelToLatLng( new GPoint( (tile.x+1)*256, (tile.y)*256 ) , zoom )
           );
           if (mapBounds.intersects(tileBounds)) {
-              return zoom+"/"+tile.x+"/"+y+".png";
+              return "tiles/"+zoom+"/"+tile.x+"/"+y+".png";
           } else {
               return "http://www.maptiler.org/img/none.png";
           }
