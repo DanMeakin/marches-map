@@ -3,248 +3,36 @@
 <head>
   <title>The Freedom Lands of Aberdeen</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-  <meta http-equiv='imagetoolbar' content='no'/>
 
   <link href='https://fonts.googleapis.com/css?family=Neuton:400,400italic,700,800,300,200' rel='stylesheet' type='text/css'>
   <link href='https://fonts.googleapis.com/css?family=Arapey:400,400italic' rel='stylesheet' type='text/css'>
 
-  <!-- Latest compiled and minified CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
-  <!-- Optional theme -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-
-  <!-- Custom Styles -->
+  <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.6.0/slick.css"/>
   <link rel="stylesheet" href="style.css">
 
-  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-  <script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyDf78DD45O6mlSyTexVPKS1CI4voWFMb2w'></script>
-  <script>
-var mapBounds = new GLatLngBounds(new GLatLng(57.1087510764, -2.29091103907), new GLatLng(57.1981551564, -2.05257611505));
-var mapMinZoom = 1;
-var mapMaxZoom = 16;
+  <script src="js/jquery.imagemapster.js"></script>
+  <script src="https://cdn.jsdelivr.net/jquery.slick/1.6.0/slick.min.js"></script>
 
-var opacity = 0.75;
-var map;
-var hybridOverlay;
-
-/*
- * Create a Custom Opacity GControl
- * http://www.maptiler.org/google-maps-overlay-opacity-control/
- */
-
-var CTransparencyLENGTH = 58; 
-// maximum width that the knob can move (slide width minus knob width)
-
-function CTransparencyControl( overlay ) {
-    this.overlay = overlay;
-    this.opacity = overlay.getTileLayer().getOpacity();
-}
-CTransparencyControl.prototype = new GControl();
-
-// This function positions the slider to match the specified opacity
-CTransparencyControl.prototype.setSlider = function(pos) {
-    var left = Math.round((CTransparencyLENGTH*pos));
-    this.slide.left = left;
-    this.knob.style.left = left+"px";
-    this.knob.style.top = "0px";
-}
-
-// This function reads the slider and sets the overlay opacity level
-CTransparencyControl.prototype.setOpacity = function() {
-    // set the global variable
-    opacity = this.slide.left/CTransparencyLENGTH;
-    this.map.clearOverlays();
-    this.map.addOverlay(this.overlay, { zPriority: 0 });
-    if (this.map.getCurrentMapType() == G_HYBRID_MAP) {
-        this.map.addOverlay(hybridOverlay);
-    }
-}
-
-// This gets called by the API when addControl(new CTransparencyControl())
-CTransparencyControl.prototype.initialize = function(map) {
-    var that=this;
-    this.map = map;
-
-    // Is this MSIE, if so we need to use AlphaImageLoader
-    var agent = navigator.userAgent.toLowerCase();
-    if ((agent.indexOf("msie") > -1) && (agent.indexOf("opera") < 1)){this.ie = true} else {this.ie = false}
-
-    // create the background graphic as a <div> containing an image
-    var container = document.createElement("div");
-    container.style.width="70px";
-    container.style.height="21px";
-
-    // Handle transparent PNG files in MSIE
-    if (this.ie) {
-      var loader = "filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.maptiler.org/img/opacity-slider.png', sizingMethod='crop');";
-      container.innerHTML = '<div style="height:21px; width:70px; ' +loader+ '" ></div>';
-    } else {
-      container.innerHTML = '<div style="height:21px; width:70px; background-image: url(http://www.maptiler.org/img/opacity-slider.png)" ></div>';
-    }
-
-    // create the knob as a GDraggableObject
-    // Handle transparent PNG files in MSIE
-    if (this.ie) {
-      var loader = "progid:DXImageTransform.Microsoft.AlphaImageLoader(src='http://www.maptiler.org/img/opacity-slider.png', sizingMethod='crop');";
-      this.knob = document.createElement("div"); 
-      this.knob.style.height="21px";
-      this.knob.style.width="13px";
-  this.knob.style.overflow="hidden";
-      this.knob_img = document.createElement("div"); 
-      this.knob_img.style.height="21px";
-      this.knob_img.style.width="83px";
-      this.knob_img.style.filter=loader;
-  this.knob_img.style.position="relative";
-  this.knob_img.style.left="-70px";
-      this.knob.appendChild(this.knob_img);
-    } else {
-      this.knob = document.createElement("div"); 
-      this.knob.style.height="21px";
-      this.knob.style.width="13px";
-      this.knob.style.backgroundImage="url(http://www.maptiler.org/img/opacity-slider.png)";
-      this.knob.style.backgroundPosition="-70px 0px";
-    }
-    container.appendChild(this.knob);
-    this.slide=new GDraggableObject(this.knob, {container:container});
-    this.slide.setDraggableCursor('pointer');
-    this.slide.setDraggingCursor('pointer');
-    this.container = container;
-
-    // attach the control to the map
-    map.getContainer().appendChild(container);
-
-    // init slider
-    this.setSlider(this.opacity);
-
-    // Listen for the slider being moved and set the opacity
-    GEvent.addListener(this.slide, "dragend", function() {that.setOpacity()});
-    //GEvent.addListener(this.container, "click", function( x, y ) { alert(x, y) });
-
-    return container;
-  }
-
-  // Set the default position for the control
-  CTransparencyControl.prototype.getDefaultPosition = function() {
-    return new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(7, 47));
-  }
-
-/*
- * Full-screen Window Resize
- */
-
-function getWindowHeight() {
-    if (self.innerHeight) return self.innerHeight;
-    if (document.documentElement && document.documentElement.clientHeight)
-        return document.documentElement.clientHeight;
-    if (document.body) return document.body.clientHeight;
-    return 0;
-}
-
-function getWindowWidth() {
-    if (self.innerWidth) return self.innerWidth;
-    if (document.documentElement && document.documentElement.clientWidth)
-        return document.documentElement.clientWidth;
-    if (document.body) return document.body.clientWidth;
-    return 0;
-}
-
-function resize() {
-    var map = document.getElementById("map");  
-    var header = document.getElementById("header");  
-    var subheader = document.getElementById("subheader");  
-    var mapWidth = getWindowWidth() - 20;
-    var mapHeight = mapWidth / 2;//* 4/3;
-    map.style.width = mapWidth + "px";
-    map.style.height = mapHeight + "px";
-    // map.checkResize();
-}
-
-
-/*
- * Main load function:
- */
-
-function load() {
-
-   if (GBrowserIsCompatible()) {
-
-      // Bug in the Google Maps: Copyright for Overlay is not correctly displayed
-      var gcr = GMapType.prototype.getCopyrights;
-      GMapType.prototype.getCopyrights = function(bounds,zoom) {
-          return [""].concat(gcr.call(this,bounds,zoom));
-      }
-
-      map = new GMap2( document.getElementById("map"), { backgroundColor: '#fff' } );
-
-      map.addMapType(G_PHYSICAL_MAP);
-      map.setMapType(G_PHYSICAL_MAP);
-
-      map.setCenter( mapBounds.getCenter(), map.getBoundsZoomLevel( mapBounds ));
-
-      hybridOverlay = new GTileLayerOverlay( G_HYBRID_MAP.getTileLayers()[1] );
-      GEvent.addListener(map, "maptypechanged", function() {
-        if (map.getCurrentMapType() == G_HYBRID_MAP) {
-            map.addOverlay(hybridOverlay);
-        } else {
-           map.removeOverlay(hybridOverlay);
-        }
-      } );
-
-      var tilelayer = new GTileLayer(GCopyrightCollection(''), mapMinZoom, mapMaxZoom);
-      var mercator = new GMercatorProjection(mapMaxZoom+1);
-      tilelayer.getTileUrl = function(tile,zoom) {
-          if ((zoom < mapMinZoom) || (zoom > mapMaxZoom)) {
-              return "http://www.maptiler.org/img/none.png";
-          }
-          var ymax = 1 << zoom;
-          var y = ymax - tile.y -1;
-          var tileBounds = new GLatLngBounds(
-              mercator.fromPixelToLatLng( new GPoint( (tile.x)*256, (tile.y+1)*256 ) , zoom ),
-              mercator.fromPixelToLatLng( new GPoint( (tile.x+1)*256, (tile.y)*256 ) , zoom )
-          );
-          if (mapBounds.intersects(tileBounds)) {
-              return "tiles/"+zoom+"/"+tile.x+"/"+y+".png";
-          } else {
-              return "http://www.maptiler.org/img/none.png";
-          }
-      }
-      // IE 7-: support for PNG alpha channel
-      // Unfortunately, the opacity for whole overlay is then not changeable, either or...
-      tilelayer.isPng = function() { return true;};
-      tilelayer.getOpacity = function() { return opacity; }
-
-      overlay = new GTileLayerOverlay( tilelayer );
-      map.addOverlay(overlay);
-
-      map.addControl(new GLargeMapControl());
-      map.addControl(new GHierarchicalMapTypeControl());
-      map.addControl(new CTransparencyControl( overlay ));
-
-
-      map.enableContinuousZoom();
-      map.enableScrollWheelZoom();
-
-      map.setMapType(G_HYBRID_MAP);
-   }
-   resize();
-}
-
-onresize=function(){ resize(); };
-</script>
 </head>
-<body onload="load()">
+<body>
   <div class="container">
-    <div class="row">
-        <h1>The Freedom Lands of Aberdeen</h1>
-    </div>
-    <div class="row">
-      <div class="col-xs-offset-2 col-xs-4 coats-of-arms">
-        <img class="coat-of-arms" src="images/burgesses-coat-of-arms.png">
+    <div class="banner-container">
+      <div class="banner">
+        <img class="banner-image" src="images/banner/Stone-01.JPG" />
+        <img class="banner-image" src="images/banner/Stone-4.JPG" />
+        <img class="banner-image" src="images/banner/Stone-18.JPG" />
       </div>
-      <div class="col-xs-4 coats-of-arms">
-        <img class="coat-of-arms" src="images/acc-coat-of-arms.png">
+      <div class="banner-nav">
+        <div class="inner slider-nav slick-initialized slick-slider">
+          <div class="banner-caption">
+            <h1>The March Stones</h1>
+            <h2>of the Freedom Lands of Aberdeen</h2>
+          </div>
+        </div>
       </div>
     </div>
   <h2>The Freedom Lands</h2>
@@ -256,6 +44,7 @@ onresize=function(){ resize(); };
   forest was granted the burgesses. The Forest of the Stocket, together with
   certain additional areas, comprises what is known as "The Freedom Lands".
   </p>
+  <!--
   <p>
   Much of the information about the Freedom Lands can be found in a book of 
   1929. This can be read and downloaded 
@@ -265,7 +54,7 @@ onresize=function(){ resize(); };
     <div class="col-md-12 visible-lg">
       <iframe class="book" src="pdf.js/web/viewer.html?file=../../resources/Freedom-Lands.pdf"></iframe>
     </div>
-  </div>
+  </div>-->
 
   <h2>The Marches</h2>
   <p>
@@ -282,13 +71,17 @@ onresize=function(){ resize(); };
   </p> 
   <p>
   The interactive map below shows the extent of The Freedom Lands and the
-  Inner and Outer Marches, the boundaries of the lands. You can view the 
-  historical extend of the lands, and in many cases, using Google Street View,
-  you can see the stones themselves.
+  Inner and Outer Marches, the boundaries of the lands.  The stones have been
+  grouped into four areas, each outlined on the map. Click onto an area to read
+  more about the stones.
   </p>
-  </div>
-  <div id="map"></div>
-  <div class="container">
+  <img src="images/map-1929-lg.jpg" style="max-width: 100%; height: auto; width: 100%;" usemap="#map" />
+  <map name="map">
+  <area data-key="urban-south" href="#" shape="poly" coords="1429,785,1397,720,1376,694,1343,700,1263,732,1062,794,803,868,569,891,520,897,505,906,495,926,466,1057,841,1055,905,1038,994,1021,1140,975,1238,930,1254,924,1262,927,1272,928,1280,930,1294,936,1319,941,1337,936,1344,933,1351,927,1360,921,1366,914,1370,904,1376,895,1377,886,1377,879,1379,868,1384,853,1389,842,1389,835,1388,830,1388,825,1392,816,1394,802,1398,797,1405,792,1414,783,1426,785,1426,784" />
+  <area data-key="rural-south" href="#" shape="poly" coords="218,198,193,158,19,157,21,1059,465,1057,494,927,454,857,266,819,260,783,272,712,325,604,348,497,338,430,313,357,248,244,220,199" />
+  <area data-key="rural-north" href="#" shape="poly" coords="193,157,267,276,346,315,410,323,509,330,594,332,679,356,758,381,795,392,841,385,878,371,901,355,929,319,948,265,949,226,930,192,911,182,866,170,796,156,756,148,724,128,699,97,673,69,652,44,626,31,616,22,366,22,319,50,277,98,241,129,194,159" />
+  <area data-key="urban-north" href="#" shape="poly" coords="881,368,904,356,931,321,950,266,972,228,1013,192,1061,173,1112,170,1155,188,1170,204,1190,226,1218,251,1243,258,1289,260,1358,261,1542,266,1571,306,1558,355,1548,400,1540,449,1540,480,1547,527,1526,566,1481,590,1416,601,1343,606,1281,601,1210,582,1105,542,1005,478,918,406,882,370" />
+  </map>
     <div class="row">
       <h2>
         Maps
@@ -333,10 +126,97 @@ onresize=function(){ resize(); };
       &bull;
       <a href="mailto:BHarrison@sportaberdeen.co.uk">Access Inquiries</a>
       </div>
+      <div id="coats-of-arms">
+        <img class="coat-of-arms" src="images/burgesses-coat-of-arms.png">
+        <img class="coat-of-arms" src="images/acc-coat-of-arms.png">
+      </div>
       Copyright &copy; 2016 Burgesses of Guild of the Royal Burgh and City of Aberdeen.
       <br />
       Images and historical information courtesy of Aberdeen City Council.
   </div>
 </body>
+  <script>
+$( document ).ready(function() {
+  // Load mapster
+  $('img').mapster({
+    stroke: true,
+    strokeColor: '0000FF',
+    fillColor: 'FFFFFF',
+    onClick: mapClick,
+    render_highlight: {
+      strokeWidth: 2
+    }, 
+    render_select: {
+      fillOpacity: 0.01,
+    },
+    mapKey: 'data-key'
+  }).mapster('set', true, 'rural-south,rural-north,urban-south,urban-north');
+  $('area.group1').mapster('set', true);
+
+  // Create banner
+  $('.banner').slick({
+    dots: false,
+    arrows: false,
+    accessibility: false,
+    infinite: true,
+    speed: 500,
+    fade: true,
+    autoplay: true,
+    autoplaySpeed: 10000,
+    pauseOnHover: false,
+    pauseOnFocus: false,
+    cssEase: 'linear'
+  })
+});
+
+var resizeTime = 100;     // total duration of the resize effect, 0 is instant
+var resizeDelay = 100;    // time to wait before checking the window size again
+
+function mapClick(data) {
+  window.open('pdf.js/web/viewer.html?file=../../resources/' + data.key + '.pdf')
+}
+
+// Resize the map to fit within the boundaries provided
+function resize(maxWidth,maxHeight) {
+     var image =  $('img'),
+        imgWidth = image.width(),
+        imgHeight = image.height(),
+        newWidth=0,
+        newHeight=0;
+
+    /*if (imgWidth/maxWidth>imgHeight/maxHeight) {
+        newWidth = maxWidth;
+    } else {
+        newHeight = maxHeight;
+    }*/
+     newWidth = $( ".container" ).width();
+    image.mapster('resize',newWidth,newHeight,resizeTime);   
+}
+
+// Track window resizing events, but only actually call the map resize when the
+// window isn't being resized any more
+
+function onWindowResize() {
+    
+    var curWidth = $(window).width(),
+        curHeight = $(window).height(),
+        checking=false;
+    if (checking) {
+        return;
+            }
+    checking = true;
+    window.setTimeout(function() {
+        var newWidth = $(window).width(),
+           newHeight = $(window).height();
+        if (newWidth === curWidth &&
+            newHeight === curHeight) {
+            resize(newWidth,newHeight); 
+        }
+        checking=false;
+    },resizeDelay );
+}
+
+$(window).bind('resize',onWindowResize);
+  </script>
 </html>
 
